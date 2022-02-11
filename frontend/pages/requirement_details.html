@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+	<!--begin::Body-->
+	<body id="kt_body" class="">
+			<!--begin::Container-->
+			<div id="kt_content_container" class="container" style="padding: 15px !important;max-width: 100%;">
+				
+				<div id="reqDiv"></div>
+					<!--begin::Modal - New Custom Question-->
+					<div class="modal fade" id="add_new_CQ_requirement_modal" tabindex="-1" aria-hidden="true">
+						<!--begin::Modal dialog-->
+						<div class="modal-dialog modal-dialog-centered mw-650px">
+							<!--begin::Modal content-->
+							<div class="modal-content">
+								<!--begin::Modal header-->
+								<div class="modal-header">
+									<!--begin::Modal title-->
+									<h2>Add Custom Question</h2>
+									<!--end::Modal title-->
+									<!--begin::Close-->
+									<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+										<!--begin::Svg Icon | path: icons/duotone/Navigation/Close.svg-->
+										<span class="svg-icon svg-icon-1">
+											<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+												<g transform="translate(12.000000, 12.000000) rotate(-45.000000) translate(-12.000000, -12.000000) translate(4.000000, 4.000000)" fill="#000000">
+													<rect fill="#000000" x="0" y="7" width="16" height="2" rx="1" />
+													<rect fill="#000000" opacity="0.5" transform="translate(8.000000, 8.000000) rotate(-270.000000) translate(-8.000000, -8.000000)" x="0" y="7" width="16" height="2" rx="1" />
+												</g>
+											</svg>
+										</span>
+										<!--end::Svg Icon-->
+									</div>
+									<!--end::Close-->
+								</div>
+								<!--end::Modal header-->
+								<!--begin::Modal body-->
+								<div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+									<!--begin::Form-->
+									<form id="add_new_CQ_requirement_form" class="form">
+										<div class="d-flex flex-column mb-7 fv-row">
+											<label class="d-flex align-items-center fs-6 fw-bold form-label mb-2">
+												<span class="required">1. Question</span>
+											</label>
+											<textarea name="question" id="questionCQ" placeholder="Enter Custom Question here" class="form-control" rows="4"></textarea>
+											<input type="hidden" required class="form-control form-control-solid" placeholder="" name="add_CQ_requrementId" id="add_CQ_requrementId" value="" />
+											
+										</div>
+										<div class="d-flex flex-column mb-7 fv-row">
+											<label class="d-flex align-items-center fs-6 fw-bold form-label mb-2">
+												<span >2. Answer Type</span>
+											</label>
+											<select name="client" id="cq_answertype" data-control="select2" data-placeholder="Select Answer Type" class="form-select form-select-solid form-select-lg">
+												<option value="YES_NO">YES or NO</option>
+												<option value="NUMERIC" >NUMERIC</option>
+												<option value="TEXT">TEXT</option>
+											</select>
+										</div>
+										
+										<div class="d-flex flex-column mb-7 fv-row">
+											<label class="d-flex align-items-center fs-6 fw-bold form-label mb-2">
+												<span>3. Ideal Answer</span>
+											</label>
+											<select name="client" id="cq_idealAanswer" data-control="select2" data-placeholder="Select Ideal Answer" class="form-select form-select-solid form-select-lg">
+												<option id="cq_idealAanswer1" value="YES">YES</option>
+												<option id="cq_idealAanswer2" value="NO">NO</option>
+												<option id="cq_idealAanswer3" value="OTHERS">OTHERS</option>
+											</select>
+										</div>
+										<div class="d-flex flex-stack">
+											<!--begin::Label-->
+											<div class="me-5">
+												<label class="fs-6 fw-bold form-label">4. Mandatory Question?</label>
+												<div class="fs-7 fw-bold text-muted">Is this a Mandatory Question?</div>
+											</div>
+											<!--end::Label-->
+											<!--begin::Switch-->
+											<label class="form-check form-switch form-check-custom form-check-solid">
+												<input class="form-check-input" type="checkbox" value="1" checked="checked">
+											</label>
+											<!--end::Switch-->
+										</div>
+										<input type="hidden" class="form-control form-control-solid" placeholder="" id="add_CQ_requrementId" name="candidate" value="" />
+
+										<div class="text-center pt-15">
+											<button type="reset"  data-bs-dismiss="modal" id="add_profile_modal_cancel" class="btn btn-light me-3">Discard</button>
+											<button type="submit" id="add_profile_modal_submit" class="btn btn-primary">
+												<span class="indicator-label">Submit</span>
+											</button>
+										</div>
+									</form>
+									<!--end::Form-->
+								</div>
+								<!--end::Modal body-->
+							</div>
+							<!--end::Modal content-->
+						</div>
+						<!--end::Modal dialog-->
+					</div>
+					<!--end::Modal - New Custom Question-->
+			</div>
+			<!--end::Container-->	
+		
+	<script>
+		var arrows;
+		jQuery(document).ready(function() {
+			loadRequirementData();
+
+			// INSERT EDUCATION //
+			// var eduForm = document.getElementById('add_education_modal_form');
+			// eduForm.addEventListener('submit', async function (e) {
+			// 	e.preventDefault();
+			// 	buttonBlock('show', '#add_education_modal_submit');
+			// 	const formData = new FormData(eduForm);
+			// 	axios({
+			// 		method: "post",
+			// 		url: serverIP+"education/add_education",
+			// 		data: formData,
+			// 		headers: { "Content-Type": "multipart/form-data" }
+			// 	})
+			// 	.then(responseData => {
+			// 		if(responseData.data.status == 'success'){
+			// 			toastr.success(responseData.data.message, { timeOut: 3000 }); 
+			// 			document.getElementById("add_education_modal_form").reset();
+			// 			buttonBlock('hide', '#add_education_modal_submit');
+			// 			$("#add_applicant_education").modal('hide');
+			// 			loadRequirementData();
+			// 		} else{
+			// 			toastr.error("Education Addition Failed", { timeOut: 3000 });   
+			// 		}
+			// 	})
+			// 	.catch((error) => {
+			// 		buttonBlock('hide', '#add_education_modal_submit');
+			// 		toastr.error(error, "Applicant Addition Failed", { timeOut: 3000 }); 
+			// 	});
+
+			//	});
+			// INSERT EDUCATION  ENDS//
+
+		});
+
+		function loadRequirementData(){
+			contentLoaderHtml = '<div style="text-align: center;background: white;border-radius: 10px;margin-bottom: 15px;"><img src="assets/media/others/loader.gif"></div>';
+			$('#profileDiv').html(contentLoaderHtml);
+			axios({
+				method: "post",
+				url: serverIP+"graphql",
+				headers: {'Content-Type': 'application/json'},
+				data: {
+					query: `query Requirement{
+					employmentTerms(where:{isActive:true, id:"`+requirementId+`"}){
+						id
+						title
+						description
+						full_remote
+						travel
+						startDate
+						endDate
+						visa_type
+						pay_rate
+						bill_rate
+						currency{
+						name
+						}
+						address{
+						houseNo
+						unitNo
+						street
+						line
+						}
+						skillLevel
+						feeType
+						client{
+						name
+						}
+						vendor{
+						name
+						}
+						endClient{
+						name
+						}
+						employmentType{
+						name
+						}
+						searchTags(where:{isActive:true}){
+						name
+						}
+						industry{
+						name
+						}
+						accountsManager{
+						id
+						names(where:{isActive:true}){
+							firstName
+							middleName
+							lastName
+						}
+						}
+						status
+					}
+					}`, 
+				}
+			})
+			.then(requirementDataResp => {
+				var requirementData = requirementDataResp.data.data.employmentTerms[0];
+				var contenHtmlReq = '';
+				contenHtmlReq += '<div class="card mb-5 mb-xl-10" style="border: 2px solid #d3d3d3a8 !important;">'+
+							'<div class="card-header border-0 cursor-pointer" role="button" style="background-color: #9b85fd;" data-bs-toggle="collapse" data-bs-target="#kt_account_profile1" aria-expanded="true" aria-controls="kt_account_profile">'+
+							'<div class="card-title m-0"><h3 class="fw-bolder m-0" style="color: white;">JOB DETAILS</h3></div></div>'+
+
+							'<div id="kt_account_profile" class=" m-1 collapse show" style="background: #dedaf9; border-radius:10px;">'+
+							'<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_basic_details" aria-expanded="true" aria-controls="kt_basic_details">'+
+							'<div class="card-title m-0"><h3 class="fw-bolder m-0">1. Basic Details</h3></div></div>'+
+							'<div id="kt_basic_details" class="collapse" style="background: white; margin: 5px; border-radius: 10px;">'+
+								'<form id="kt_account_profile_details_form" class="form">'+
+									'<div class="card-body border-top p-9 row">'+
+										'<div class="col-xl-6">'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Job Title</label>'+
+											'<div class="col-lg-8"><input placeholder="Job Title" value="" id="basic_jobTitle" type="text" name="basic_jobTitle" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"/></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Job Location</label>'+
+											'<div class="col-lg-8"><input placeholder="Job Location" value="" id="basic_jobLocation" type="text" name="basic_jobLocation" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"/></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Employment Type</label>'+
+											'<div class="col-lg-8"><select required name="client" id="basic_jobEmpType" data-control="select2" data-placeholder="Select Employment Type" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Visa Type</label>'+
+											'<div class="col-lg-8"><select required name="client" id="basic_visaType" data-control="select2" data-placeholder="Select Visa Type" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Select Industry</label>'+
+											'<div class="col-lg-8"><select required name="client" id="basic_industry" data-control="select2" data-placeholder="Select Industry" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Job Vacancies</label>'+
+											'<div class="col-lg-8"><input placeholder="Job Vacancies" value="" id="basic_jobVacancy" type="text" name="basic_jobVacancy" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"/></div>'+
+											'</div>'+
+										'</div>'+
+										'<div class="col-xl-6">'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Start Date</label>'+
+											'<div class="col-lg-8"><input type="date" required class="form-control form-control-solid" placeholder="" name="certificateDate" id="addCert_certificateDate" value="" /></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Last Date</label>'+
+											'<div class="col-lg-8"><input type="date" required class="form-control form-control-solid" placeholder="" name="certificateDate" id="addCert_certificateDate" value="" /></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label fw-bold fs-6">Client</label>'+
+											'<div class="col-lg-8"><select name="client" id="basic_jobEmpClient"  data-placeholder="Select Client" data-control="select2" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label fw-bold fs-6">Vendor</label>'+
+											'<div class="col-lg-8"><select name="vendor" id="basic_jobEmpVendor" data-placeholder="Select Vendor" data-control="select2" data-placeholder="Select Vendor" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label fw-bold fs-6">Accounts Manager</label>'+
+											'<div class="col-lg-8"><select required name="client" id="basic_accoutsManager" data-control="select2" data-placeholder="Select Account Manager" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div>'+
+											'<div class="row mb-6"><label class="col-lg-4 col-form-label fw-bold fs-6">Recruitment Manager</label>'+
+											'<div class="col-lg-8"><select required name="client" id="basic_recruitmentManager" data-control="select2" data-placeholder="Select Recruitment Manager" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+
+								'<div class="col-lg-12 fv-row"><div class="card-footer d-flex justify-content-end py-6 px-9">'+
+									'<button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>'+
+									'<button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Save Changes</button>'+
+								'</div></form></div>'+
+							'</div></div>'+
+
+							'<div id="kt_account_profile" class=" m-1 collapse show" style="background: #dedaf9; border-radius:10px;">'+
+							'<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_desc_details" aria-expanded="true" aria-controls="kt_basic_details">'+
+							'<div class="card-title m-0"><h3 class="fw-bolder m-0">2. Job Description</h3></div></div>'+
+							'<div id="kt_desc_details" class="collapse" style="background: white; margin: 5px; border-radius: 10px;">'+
+								'<form id="kt_account_profile_details_form" class="form">'+
+									'<div class="card-body border-top p-9 row">'+
+										'<div class="col-xl-12">'+
+											' <div class="form-group">'+
+												'<label for="exampleTextarea">Job Description</label>'+
+												'<textarea placeholder="Enter Job Description here" class="form-control" rows="10"></textarea>'+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+
+								'<div class="col-lg-12 fv-row"><div class="card-footer d-flex justify-content-end py-6 px-9">'+
+									'<button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>'+
+									'<button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Save Changes</button>'+
+								'</div></form></div>'+
+							'</div></div>'+
+							
+
+							'<div id="kt_account_profile" class=" m-1 collapse show" style="background: #dedaf9; border-radius:10px;">'+
+							'<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_skill_details" aria-expanded="true" aria-controls="kt_basic_details">'+
+							'<div class="card-title m-0"><h3 class="fw-bolder m-0">3. Qualifications & Skills</h3></div></div>'+
+							'<div id="kt_skill_details" class="collapse" style="background: white; margin: 5px; border-radius: 10px;">'+
+								'<form id="kt_account_profile_details_form" class="form">'+
+									'<div class="card-body border-top p-9 row">'+
+										'<div class="col-xl-12 row">'+
+											'<div class="col-xl-6 row"><div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Qualification</label>'+
+											'<div class="col-lg-8"><select required name="client" id="job_qualification" data-placeholder="Select Qualifications" multiple="multiple" data-control="select2" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div></div>'+
+											'<div class="col-xl-6 row"><div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Skills</label>'+
+											'<div class="col-lg-8"><select required name="client" id="job_skill" data-placeholder="Select Skills" multiple="multiple" data-control="select2" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div></div>'+
+										'</div>'+
+										
+									'</div>'+
+
+								'<div class="col-lg-12 fv-row"><div class="card-footer d-flex justify-content-end py-6 px-9">'+
+									'<button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>'+
+									'<button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Save Changes</button>'+
+								'</div></form></div>'+
+							'</div></div>'+
+
+
+							'<div id="kt_account_profile" class=" m-1 collapse show" style="background: #dedaf9; border-radius:10px;">'+
+							'<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_billing_details" aria-expanded="true" aria-controls="kt_basic_details">'+
+							'<div class="card-title m-0"><h3 class="fw-bolder m-0">4. Billing</h3></div></div>'+
+							'<div id="kt_billing_details" class="collapse" style="background: white; margin: 5px; border-radius: 10px;">'+
+								'<form id="kt_account_profile_details_form" class="form">'+
+									'<div class="card-body border-top p-9 row">'+
+										'<div class="col-xl-12 row">'+
+											'<div class="col-xl-6 row"><div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Pay Rate</label>'+
+											'<div class="col-lg-8"> <div class="input-group input-group-solid"><input type="number" id="billing_payrate" class="form-control"/><div class="input-group-append">'+
+												'<select required name="client" id="billing_payrate_cur" data-control="select2" data-placeholder="Select Currency" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div></div></div></div>'+
+											'<div class="col-xl-6 row"><div class="row mb-6"><label class="col-lg-4 col-form-label required fw-bold fs-6">Bill Rate</label>'+
+											'<div class="col-lg-8"> <div class="input-group input-group-solid"><input type="number" id="billing_billrate" class="form-control"/><div class="input-group-append">'+
+												'<select required name="client" id="billing_billrate_cur" data-control="select2" data-placeholder="Select Currency" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div></div></div></div>'+
+											'<div class="col-xl-6 row"><div class="row mb-6"><label class="col-lg-4 col-form-label fw-bold fs-6">Fee</label>'+
+											'<div class="col-lg-8"> <div class="input-group input-group-solid"><input type="number" id="billing_fee" class="form-control"/><div class="input-group-append">'+
+												'<select name="client" id="billing_fee_cur" data-control="select2" data-placeholder="Select Currency" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div></div></div></div>'+
+											'<div class="col-xl-6 row"><div class="row mb-6"><label class="col-lg-4 col-form-label fw-bold fs-6">Fee Type</label>'+
+											'<div class="col-lg-8"> <div class="input-group input-group-solid">'+
+												'<select name="client" id="billing_fee_type" data-control="select2" data-placeholder="Select Fee Type" class="form-select form-select-solid form-select-lg"></select></div>'+
+											'</div></div></div></div>'+
+										'</div>'+
+										'<div class="col-lg-12 fv-row"><div class="card-footer d-flex justify-content-end py-6 px-9">'+
+									'<button type="reset" class="btn btn-light btn-active-light-primary me-2">Discard</button>'+
+									'<button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Save Changes</button>'+
+								'</div></form></div>'+
+										
+								'</div></div>'+
+							
+								'<div id="kt_account_profile" class=" m-1 collapse show" style="background: #dedaf9; border-radius:10px;">'+
+								'<div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_questions" aria-expanded="true" aria-controls="kt_basic_details">'+
+								'<div class="card-title m-0"><h3 class="fw-bolder m-0">5. Custom</h3></div></div>'+
+								'<div id="kt_questions" class="collapse" style="background: white; margin: 5px; border-radius: 10px;">'+
+									'<div class="card-body border-top p-9 row">'+
+										'<div class="col-xl-12">'+
+											'<div class="notice d-flex bg-light-primary rounded border-primary border border-dashed p-6">'+
+												'<span class="svg-icon svg-icon-2tx svg-icon-primary me-4">'+
+													'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">'+
+														'<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">'+
+															'<rect x="0" y="0" width="24" height="24" />'+
+															'<path d="M4,4 L11.6314229,2.5691082 C11.8750185,2.52343403 12.1249815,2.52343403 12.3685771,2.5691082 L20,4 L20,13.2830094 C20,16.2173861 18.4883464,18.9447835 16,20.5 L12.5299989,22.6687507 C12.2057287,22.8714196 11.7942713,22.8714196 11.4700011,22.6687507 L8,20.5 C5.51165358,18.9447835 4,16.2173861 4,13.2830094 L4,4 Z" fill="#000000" opacity="0.3" />'+
+															'<path d="M11.1750002,14.75 C10.9354169,14.75 10.6958335,14.6541667 10.5041669,14.4625 L8.58750019,12.5458333 C8.20416686,12.1625 8.20416686,11.5875 8.58750019,11.2041667 C8.97083352,10.8208333 9.59375019,10.8208333 9.92916686,11.2041667 L11.1750002,12.45 L14.3375002,9.2875 C14.7208335,8.90416667 15.2958335,8.90416667 15.6791669,9.2875 C16.0625002,9.67083333 16.0625002,10.2458333 15.6791669,10.6291667 L11.8458335,14.4625 C11.6541669,14.6541667 11.4145835,14.75 11.1750002,14.75 Z" fill="#000000" />'+
+														'</g>'+
+													'</svg>'+
+												'</span>'+
+												'<div class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap">'+
+													'<div class="mb-3 mb-md-0 fw-bold">'+
+														'<h4 class="text-gray-900 fw-bolder">Add Custom Question</h4>'+
+													'</div>'+
+													'<a class="btn btn-primary px-6 align-self-center text-nowrap" onClick="addCustomQuestion();">Add</a>'+
+												'</div>'+
+										'</div>'+
+									'</div>'+
+							'</div>';
+					// LOAD EmployemntTypes
+					axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query employmentTypes{
+								employmentTypes(where:{isActive:true}){
+									id
+									name
+								}
+							}`, 
+						}
+					})
+					.then(resp => {
+						var employmentTypesData = resp.data.data.employmentTypes;
+						var contentHTMLemploymentTypes = '<option selected="true" disabled="disabled" value="">Select Employment Type</option>';
+						for(var i=0;i<employmentTypesData.length;i++){
+							contentHTMLemploymentTypes += '<option id="'+employmentTypesData[i].name+'" value='+employmentTypesData[i].id+'>'+employmentTypesData[i].name+'</option>';
+						}
+						$('#basic_jobEmpType').html(contentHTMLemploymentTypes);
+						$("#basic_jobEmpType").select2();
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Employment Type Fetching Failed", { timeOut: 3000 }); 
+					});
+
+					// LOAD industries
+					axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query Industries{
+							industries(where:{isActive:true}){
+									id
+									name
+								}
+							}`, 
+						}
+					})
+					.then(resp => {
+						var industriesData = resp.data.data.industries;
+						var contentHTMLindustriesData = '<option selected="true" disabled="disabled" value="">Select Employment Type</option>';
+						for(var i=0;i<industriesData.length;i++){
+							contentHTMLindustriesData += '<option id="'+industriesData[i].name+'" value='+industriesData[i].id+'>'+industriesData[i].name+'</option>';
+						}
+						$('#basic_industry').html(contentHTMLindustriesData);
+						$("#basic_industry").select2();
+						$("#basic_accoutsManager").select2();
+						$("#basic_recruitmentManager").select2();
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Industry Fetching Failed", { timeOut: 3000 }); 
+					});
+
+					// LOAD Clients
+
+					axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query Clients{
+                            thirdParties(where:{isActive:true, partyType:"RECRUITER"}){
+                                    id
+                                    name
+                                }
+                            }`, 
+						}
+					})
+					.then(resp => {
+						var clientData = resp.data.data.thirdParties;
+						var contentHTMLclientData = '<option selected="true" disabled="disabled" value="">Select Client</option>';
+						var contentHTMLvendorData = '<option selected="true" disabled="disabled" value="">Select Vendor</option>';
+						for(var i=0;i<clientData.length;i++){
+							contentHTMLclientData += '<option id="client_'+clientData[i].name+'" value='+clientData[i].id+'>'+clientData[i].name+'</option>';
+							contentHTMLvendorData += '<option id="vendor_'+clientData[i].name+'" value='+clientData[i].id+'>'+clientData[i].name+'</option>';
+						}
+						
+						$('#basic_jobEmpClient').html(contentHTMLclientData);
+						$('#basic_jobEmpVendor').html(contentHTMLvendorData);
+						$("#basic_jobEmpClient").select2();
+						$("#basic_jobEmpVendor").select2();
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Client / Vendor Fetching Failed", { timeOut: 3000 }); 
+					});
+
+					// LOAD VisaTypes
+
+					axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query VisaTypes{
+								visaTypes(where:{isActive:true}){
+										id
+										name
+									}
+								}`, 
+						}
+					})
+					.then(resp => {
+						var clientData = resp.data.data.visaTypes;
+						var contentHTMLvisType = '<option selected="true" disabled="disabled" value="">Select Visa Type</option>';
+						for(var i=0;i<clientData.length;i++){
+							contentHTMLvisType += '<option id="'+clientData[i].name+'" value='+clientData[i].id+'>'+clientData[i].name+'</option>';
+						}
+						$('#basic_visaType').html(contentHTMLvisType);
+						$("#basic_visaType").select2();
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Visa Type Fetching Failed", { timeOut: 3000 }); 
+					});
+					
+					// LOAD Qualification
+
+					axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query Qualification{
+								qualifications(where:{isActive:true}){
+										id
+										name
+									}
+								}`, 
+						}
+					})
+					.then(resp => {
+						var qualificationData = resp.data.data.qualifications;
+						var contentHTMLQualData = '';
+						for(var i=0;i<qualificationData.length;i++){
+							contentHTMLQualData += '<option id="'+qualificationData[i].name+'" value='+qualificationData[i].id+'>'+qualificationData[i].name+'</option>';
+						}
+						$('#job_qualification').html(contentHTMLQualData);
+						$("#job_qualification").select2();
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Qualifications Fetching Failed", { timeOut: 3000 }); 
+					});
+			
+					// LOAD SKILLS
+
+					axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query Skills{
+								skills(where:{isActive:true}){
+										id
+										name
+									}
+								}`, 
+						}
+					})
+					.then(resp => {
+						var skillData = resp.data.data.skills;
+						var contentHTMLSkillData = '';
+						for(var i=0;i<skillData.length;i++){
+							contentHTMLSkillData += '<option id="'+skillData[i].name+'" value='+skillData[i].id+'>'+skillData[i].name+'</option>';
+						}
+						$('#job_skill').html(contentHTMLSkillData);
+						$("#job_skill").select2();
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Skills Fetching Failed", { timeOut: 3000 }); 
+					});
+
+					// LOAD CURRENCY
+
+					axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query Currencies{
+								currencies(where:{isActive:true}){
+										id
+										name
+											abbreviation
+											symbol
+									}
+								}`, 
+						}
+					})
+					.then(resp => {
+						var currencyData = resp.data.data.currencies;
+						var contentHTMLPayCurrency = '';
+						var contentHTMLBillCurrency = '';
+						var contentHTMLFeeCurrency = '';
+						for(var i=0;i<currencyData.length;i++){
+							contentHTMLPayCurrency += '<option id="pay_'+currencyData[i].name+'" value='+currencyData[i].id+'>'+currencyData[i].name+' - ' +currencyData[i].abbreviation+'</option>';
+							contentHTMLBillCurrency += '<option id="bill_'+currencyData[i].name+'" value='+currencyData[i].id+'>'+currencyData[i].name+' - ' +currencyData[i].abbreviation+'</option>';
+							contentHTMLFeeCurrency += '<option id="fee_'+currencyData[i].name+'" value='+currencyData[i].id+'>'+currencyData[i].name+' - ' +currencyData[i].abbreviation+'</option>';
+						}
+						
+						$('#billing_billrate_cur').html(contentHTMLBillCurrency);
+						$('#billing_payrate_cur').html(contentHTMLPayCurrency);
+						$('#billing_fee_cur').html(contentHTMLFeeCurrency);
+						$("#billing_billrate_cur").select2();
+						$("#billing_payrate_cur").select2();
+						$("#billing_fee_cur").select2();
+						
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Currency Fetching Failed", { timeOut: 3000 }); 
+					});
+					
+					// LOAD FEE TYPE
+
+						axios({
+						method: "post",
+						url: serverIP+"graphql",
+						headers: {'Content-Type': 'application/json'},
+						data: {
+							query: `query FeeTypes{
+								feeTypes(where:{isActive:true}){
+									id
+									name
+									}
+								}`, 
+						}
+					})
+					.then(resp => {
+						var FeeData = resp.data.data.feeTypes;
+						var contentHTMLFeeData = '';
+						for(var i=0;i<FeeData.length;i++){
+							contentHTMLFeeData += '<option id="'+FeeData[i].name+'" value='+FeeData[i].id+'>'+FeeData[i].name+'</option>';
+						}
+						$('#billing_fee_type').html(contentHTMLFeeData);
+						$("#billing_fee_type").select2();
+					})
+					.catch((error) => {
+						console.log(error);
+						toastr.error(error	, "Fee Type Fetching Failed", { timeOut: 3000 }); 
+					});
+
+
+				$('#reqDiv').html(contenHtmlReq);
+				
+			
+			})
+			.catch((error) => {
+				console.log(error);
+				toastr.error(error	, "Requirement Data Fetching Failed", { timeOut: 3000 }); 
+			});
+		}
+		
+	</script>
+	</body>
+	<!--end::Body-->
+</html>

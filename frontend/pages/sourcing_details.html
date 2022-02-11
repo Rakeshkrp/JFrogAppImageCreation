@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+	<!--begin::Body-->
+	<body id="kt_body" class="">
+			<!--begin::Container-->
+			<div id="kt_content_container" class="container" style="padding: 15px !important;max-width: 100%;">
+			
+				<div style="text-align: center; margin: 20px;">
+					<h2> <span id="sourcing_jobName"></span></h2>
+					<h3> <span id="sourcing_companyName"></span></h3>
+					<h4> <span id="sourcing_count">No Candidates</span></h4>
+				</div>
+				<div class="d-flex flex-column mb-7 fv-row no-display" id="soucingCandidateListDiv">
+					<label class="d-flex align-items-center fs-6 fw-bold form-label mb-2" style="text-align: center;margin: 0 auto;">
+						<span class="required">Source Applicant </span>
+					</label>
+					<div style="width: 80%; max-width: 400px; margin: 0 auto; border: 2px solid #765bef; border-radius: 5px;">
+						<select required name="soucingCandidateListDrop" id="soucingCandidateListDrop" data-placeholder="Select Candidates"  data-control="select2" class="form-select form-select-solid form-select-lg"></select>
+					</div>
+				</div>
+				<div class="card-body pt-0 pb-3" style="padding-top: 25px !important; background: white; padding: 20px; border-radius: 15px;">
+					<div class="tab-content">
+						<!--begin::Table-->
+						<div class="table-responsive">
+							<table class="table table-head-custom table-head-bg table-borderless table-vertical-center">
+								<thead>
+									<tr class="text-center text-uppercase" style="font-weight: 700;">
+										<th style="min-width: 40px" class="pl-7">#</th>
+										<th style="min-width: 250px" class="pl-7">Applicant</th>
+										<!-- <th style="min-width: 100px">Qualification</th> -->
+										<th style="min-width: 100px">Created By</th>
+										<th style="min-width: 100px">Created On</th>
+										<th style="min-width: 80px">Action</th>
+									</tr>
+								</thead>
+								<tbody id="sourcingDiv">
+									<tr class="text-center">
+										<td colspan="6">NO APPLICANT ADDED</td>
+										</tr>
+									<tr>
+								</tbody>
+							</table>
+						</div>
+						<!--end::Table-->
+					</div>
+				</div>
+			</div>
+			
+			<!--end::Container-->	
+		
+<script>
+	var arrows;
+	var currentDataArray = [];
+	jQuery(document).ready(function() {
+		if(sourcingStage == "APPLICANT"){
+			$("#soucingCandidateListDiv").removeClass('no-display');
+			loadsoucingCandidateList();
+		}
+		loadSourcingData();
+		$('#soucingCandidateListDrop').on('select2:select', function (e) {
+			setTimeout(() => {
+				addtoSourcing();
+			}, 100);
+		});
+
+
+	});
+
+	function loadsoucingCandidateList(){
+		axios({
+			method: "post",
+			url: serverIP+"graphql",
+			headers: {'Content-Type': 'application/json'},
+			data: {
+				query: `query Candidates{
+					candidates(where:{isActive:true}){
+						id
+						createdAt
+						createdBy{
+							names{
+								firstName
+								middleName
+								lastName
+							}
+						}
+						user{
+							names(where:{isActive:true}){
+								firstName
+								lastName
+								middleName
+							}
+						}
+					}
+				}`, 
+			}
+		})
+		.then(resp => {
+			candidateRawData = resp.data.data.candidates;
+			var contentHTMLCandidateData = '<option id="0" value="0">Select an Applicant</option>';
+
+			for(var i=0;i<candidateRawData.length;i++){
+				var createdAt 	= new Date(candidateRawData[i].createdAt).toDateString();
+
+				var createdBy 	= '';
+				if(candidateRawData[i].createdBy != null){
+					createdBy 	= nameJoiner(candidateRawData[i].createdBy.names[0]);
+				}
+				
+				var candidateName = '';
+				if(candidateRawData[i].user.names.length > 0){
+					candidateName 	= nameJoiner(candidateRawData[i].user.names[0]);
+				}
+				contentHTMLCandidateData += '<option data-createdat="'+createdAt+'" data-createdby="'+createdBy+'" id="'+candidateRawData[i].id+'" value='+candidateRawData[i].id+'>'+candidateName+'</option>';
+			}
+			$('#soucingCandidateListDrop').html(contentHTMLCandidateData);
+			$("#soucingCandidateListDrop").select2();
+		})
+		.catch((error) => {
+			console.log(error);
+			toastr.error(error	, "Candidates Fetching Failed", { timeOut: 3000 }); 
+		});
+	}
+
+	function addtoSourcing(){
+		var hasMatch = false;
+		var data = $("#soucingCandidateListDrop").select2().find(":selected")[0];
+		if(data.id != 0){
+			console.log(currentDataArray);
+			for (var index = 0; index < currentDataArray.length; ++index) {
+				if(currentDataArray[index].id == data.id){
+					hasMatch = true;
+					break;
+				}
+			}
+			if(!hasMatch){
+				var selectCandidateData = [];
+				selectCandidateData.createdAt 	= $('#soucingCandidateListDrop').find(':selected').data('createdat');
+				selectCandidateData.createdBy 	= $('#soucingCandidateListDrop').find(':selected').data('createdby');
+				selectCandidateData.id 			= data.id;
+				selectCandidateData.name 		= data.text;
+
+				jsonData = {sourcingId: sourcingId, candidateId:selectCandidateData.id};
+				axios({
+					method: "post",
+					url: serverIP+"sourcing-details/add_candidate",
+					data: jsonData,
+					headers: { "Content-Type": "application/json" }
+				})
+				.then(response => {
+					if(response.data.status == 'success'){
+						toastr.success(data.text +" Added to Sourcing", "Successfully Added", { timeOut: 3000 }); 
+						currentDataArray[currentDataArray.length] = selectCandidateData;
+						loadApplicantListHtml();
+					} else{
+						toastr.error("Sourcing Addition Failed",response.data.message, { timeOut: 3000 });   
+					}
+				})
+				.catch((error) => {
+					toastr.error(error, "Sourcing Addition Failed", { timeOut: 3000 }); 
+				});
+				
+			} else {
+				toastr.info(data.text +" Not Added", "Applicant Already In List", { timeOut: 3000 }); 
+				
+			}
+		}
+		$('#soucingCandidateListDrop').val(0).trigger('change');
+	}
+
+				
+	function loadSourcingData(){
+		axios({
+			method: "post",
+			url: serverIP+"graphql",
+			headers: {'Content-Type': 'application/json'},
+			data: {
+				query: `query Candidates{
+					employmentTerms(where:{isActive:true, id:"`+sourcingId+`", }){
+						id
+						createdAt
+						title
+						client{
+							name
+						}
+						sourcing_details(where:{isActive:true, currentStatus:"`+sourcingStage+`"}){
+							_id
+							candidate_profile{
+							id
+							name{
+								firstName
+								middleName
+								lastName
+							}
+							candidate{
+							id
+							user{
+								createdAt
+							}
+							createdBy{
+								names{
+									firstName
+									middleName
+									lastName
+								}
+							}
+						}
+						}
+						isApproved
+						}
+					}
+					}`, 
+			}
+		})
+		.then(resp => {
+			sourcedData = resp.data.data.employmentTerms[0];
+			$('#sourcing_companyName').html(sourcedData.client.name);
+			$('#sourcing_jobName').html(sourcedData.title);
+			var sourcing_count = 'No Candidate';
+			if(sourcedData.sourcing_details.length > 1){
+				sourcing_count = sourcedData.sourcing_details.length+' Candidates';
+			} else if(sourcedData.sourcing_details.length != 0){
+				sourcing_count = sourcedData.sourcing_details.length+' Candidate';
+			}
+
+			$('#sourcing_count').html(sourcing_count);
+			
+			for(var k=0;k<sourcedData.sourcing_details.length;k++){
+				var applicantData = sourcedData.sourcing_details;
+				var candidateDetails = [];
+				candidateDetails.id 			= applicantData[k].candidate_profile.candidate.id;
+				candidateDetails.name 			= nameJoiner(applicantData[k].candidate_profile.name);
+				candidateDetails.createdBy 		= nameJoiner(applicantData[k].candidate_profile.candidate.createdBy.names[0]);
+				candidateDetails.createdAt 		= new Date(applicantData[k].candidate_profile.candidate.user.createdAt).toDateString();
+				candidateDetails.sourceEntryId 	= applicantData[k]._id;
+				currentDataArray = [];
+				currentDataArray.push(candidateDetails);
+			}
+			loadApplicantListHtml();
+		})
+		.catch((error) => {
+			console.log(error)
+			toastr.error(error	, "Sourcing Datails Fetching Failed", { timeOut: 3000 }); 
+		});
+	}
+
+	function loadApplicantListHtml(){
+		if(currentDataArray.length == 0){
+			return;
+		}
+		var contentHtmlSourcedData = '';
+		for(var j=0;j<currentDataArray.length;j++){
+			contentHtmlSourcedData += '<tr class="text-center">'+
+								'<td>'+(j+1)+'</td>'+
+								'<td><span class="text-dark-75 font-weight-bolder d-block font-size-lg">'+currentDataArray[j].name+'</span>'+
+									'<span class="text-muted font-weight-bold">ID: '+currentDataArray[j].id+'</span>'+
+								'</td>'+
+								// '<td>'+
+								// 	'<span class="text-dark-75 font-weight-bolder d-block font-size-lg">M COM</span>'+
+								// 	'<span class="text-muted font-weight-bold">Jan 2020</span>'+
+								// '</td>'+
+								'<td>'+
+									'<span class="text-dark-75 font-weight-bolder d-block font-size-lg">'+currentDataArray[j].createdBy+'</span>'+
+								'</td>'+
+								'<td>'+
+									'<span class="text-dark-75 font-weight-bolder d-block font-size-lg">'+currentDataArray[j].createdAt+'</span>'+
+								'</td>'+
+								'<td class="pr-0 text-right">'+
+									'<a href="#" class="btn btn-light-success font-weight-bolder font-size-sm" onclick="updateCandidateSourcing(\''+currentDataArray[j].sourceEntryId+'\',\'APPROVE\')">APPROVE</a>'+
+									'<a href="#" class="btn btn-light-danger font-weight-bolder font-size-sm" onclick="updateCandidateSourcing(\''+currentDataArray[j].sourceEntryId+'\',\'REJECT\')">REJECT</a>'+
+								'</td>'+
+							'</tr>';
+		}
+		$('#sourcingDiv').html(contentHtmlSourcedData);
+	}
+
+	</script>
+	</body>
+	<!--end::Body-->
+</html>
