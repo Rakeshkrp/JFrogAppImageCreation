@@ -1,0 +1,61 @@
+name: Deploy app to EKS
+
+on:
+  push:
+    branches:
+    - main
+
+env:
+  EKS_CLUSTER: jfrogTest
+  EKS_REGION: us-east-2
+
+jobs:
+  Job1:
+    name: Setup and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+   ## AWS Credentials
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.EKS_REGION }}
+
+    # Get the EKS credentials so we can deploy to the cluster
+    - run: |-
+        aws eks --region $EKS_REGION update-kubeconfig --name $EKS_CLUSTER
+        
+              
+    # Login to Jfrog
+    - name: Jfrog login
+      env:
+        JFROG_USER: ${{ secrets.JFROG_USER }}
+        JFROG_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+      run: |
+        docker login sreyo.jfrog.io -u $JFROG_USER -p $JFROG_PASSWORD
+        kubectl delete secret jfrog-secret --ignore-not-found 
+        kubectl create secret generic jfrog-secret --from-file=.dockerconfigjson=/home/runner/.docker/config.json  --type=kubernetes.io/dockerconfigjson
+    
+        
+    # Deploy docorized app image to the GKE cluster
+    - name: Deploy Frontend 
+      run: |-
+        kubectl apply -f authentication.yaml
+        kubectl wait --timeout=90s --for=condition=ready pod -l app=authentication
+        kubectl rollout restart deploy authentication-deployment
+        kubectl rollout status deployment authentication-deployment
+        
+    # Deploy gateway and virtual services
+    - name: Deploy gateway
+      run: |-
+        kubectl apply -f gateway.yaml
+        kubectl get svc -l=istio=ingressgateway -n istio-system
+        #kubectl apply -f gateway.yaml
+        kubectl apply -f vs-authentication.yaml
+        
+
+  
